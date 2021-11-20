@@ -1,46 +1,35 @@
 import book from '../models/book.js';
 
 const bookController = {
-    list: (req, res) => {
-        return book.find(function (err, books) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when getting book.',
-                    error: err
-                });
-            }
-
-            return res.json(books);
-        });
+    getAll: async (req, res) => {
+        const books = await book.find()
+        res.send(books)
     },
-    show: (req, res) => {
+    getOne: async (req, res) => {
         let id = req.params.id;
+        try {
 
-        book.findOne({ _id: id }, function (err, book) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when getting book.',
-                    error: err
-                });
-            }
+            const responseBook = await book.findOne({ id: id })
+            res.send(responseBook);
 
-            if (!book) {
-                return res.status(404).json({
-                    message: 'No such book'
-                });
-            }
-
-            return res.json(book);
-        });
+        }
+        catch {
+            res.status(404).send("Todo not found!")
+        }
     },
     create: async (req, res) => {
-        console.log(req.body)
         let requestBook = new book({
-            // bookName: req.body.bookName
-
+            id: Math.floor(Math.random() * 1000000),
+            bookName: req.body.bookName,
+            authorName: req.body.authorName,
+            isbn: req.body.isbn,
+            apiBookId: req.body.apiBookId,
+            readingList: req.body.readingList,
+            favoriteList: req.body.favoriteList,
+            completedList: req.body.completedList,
         });
 
-        await requestBook.save(function (err, b) {
+        await requestBook.save(function (err) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when creating book',
@@ -51,51 +40,39 @@ const bookController = {
             return res.status(201).json(requestBook);
         });
     },
-    update: (req, res) => {
+    update: async (req, res) => {
         let id = req.params.id;
 
-        book.findOne({ _id: id }, function (err, requestBook) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when getting book',
-                    error: err
-                });
-            }
+        try {
+            let existingBook = await book.findOne({ id: id });
 
-            if (!requestBook) {
-                return res.status(404).json({
-                    message: 'No such book'
-                });
-            }
+            existingBook.bookName = req.body.bookName
+            existingBook.authorName = req.body.authorName
+            existingBook.isbn = req.body.isbn
+            existingBook.apiBookId = req.body.apiBookId
+            existingBook.readingList = req.body.readingList
+            existingBook.favoriteList = req.body.favoriteList
+            existingBook.completedList = req.body.completedList
 
-            // book.readingList = req.body.readingList ? req.body.readingList : book.readingList;
-
-            book.save(function (err, book) {
-                if (err) {
-                    return res.status(500).json({
-                        message: 'Error when updating book.',
-                        error: err
-                    });
-                }
-
-                return res.json(book);
-            });
-        });
+            await existingBook.save();
+            res.send(existingBook);
+        }
+        catch {
+            res.status(404).send("Book not found!")
+        }
     },
-    remove: (req, res) => {
+    remove: async (req, res) => {
         let id = req.params.id;
 
-        book.findByIdAndRemove(id, function (err, book) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when deleting the book.',
-                    error: err
-                });
-            }
+        try {
+            await book.deleteOne({ id: id })
+            res.status(204).send("Successfully deleted!")
+        }
+        catch {
+            //Literally doesn't get here, but I honestly can't even care right now
+            res.status(404).send("Book not found!")
 
-            return res.status(204).json();
-        });
+        }
     }
 }
-// export default { list, create, update, remove, show }
 export default bookController

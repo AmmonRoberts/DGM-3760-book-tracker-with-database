@@ -1,5 +1,4 @@
 import express from "express";
-import bodyParser from "body-parser";
 import router from './routes/bookRoutes.js';
 import mongoose from "mongoose";
 import {
@@ -13,11 +12,11 @@ const port = 3000;
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    app.use('/books', router);
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({
+    app.use(express.json());
+    app.use(express.urlencoded({
       extended: true
     }));
+    app.use('/books', router);
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });

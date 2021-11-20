@@ -4,9 +4,9 @@ import bookController from '../controllers/bookController.js'
 let router = express.Router();
 
 
-router.get('/', bookController.list);
+router.get('/', bookController.getAll);
 
-router.get('/:id', bookController.show);
+router.get('/:id', bookController.getOne);
 
 router.post('/', bookController.create);
 
