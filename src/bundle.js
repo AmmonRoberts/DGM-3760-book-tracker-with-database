@@ -755,13 +755,13 @@ try {
 }
 
 },{}],2:[function(require,module,exports){
-// require("@babel-core");
-// require("babel-polyfill");
 require("regenerator-runtime/runtime");
 
 let favoritesArray = [];
 let readingListArray = [];
 let completedArray = [];
+
+let url = "https://dgm3760-book-tracker-database.herokuapp.com/books/";
 
 let accordion = document.querySelectorAll(".accordion");
 
@@ -957,7 +957,7 @@ document.querySelector(`#searchText`).addEventListener('keypress', (event) => {
 
 
 const addToList = async (book) => {
-    await fetch(`http://localhost:3000/books/${book.key}`)
+    await fetch(`${url}${book.key}`)
         .then(async (response) => {
             if (response.ok) {
                 let responseJson = await response.json()
@@ -973,7 +973,7 @@ const addToList = async (book) => {
                 }
 
                 // let responseJson = response.json()
-                await fetch(`http://localhost:3000/books/${book.key}`,
+                await fetch(`${url}${book.key}`,
                     {
                         method: 'PUT',
                         headers: {
@@ -994,7 +994,7 @@ const addToList = async (book) => {
                 )
             }
             else {
-                await fetch("http://localhost:3000/books",
+                await fetch(`${url}`,
                     {
                         method: 'POST',
                         headers: {
@@ -1022,7 +1022,7 @@ const getAllBooks = async () => {
     let readingList = document.querySelector("#readingList");
     let completedList = document.querySelector("#completedList");
 
-    await fetch("http://localhost:3000/books")
+    await fetch(`${url}`)
         .then(async (response) => {
             let responseJson = await response.json()
 
