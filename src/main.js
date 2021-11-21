@@ -1,6 +1,6 @@
-import "babel-core/register";
-import "babel-polyfill";
-import "regenerator-runtime/runtime.js";
+// require("@babel-core");
+// require("babel-polyfill");
+require("regenerator-runtime/runtime");
 
 let favoritesArray = [];
 let readingListArray = [];
