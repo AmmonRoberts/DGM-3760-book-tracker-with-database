@@ -7,7 +7,6 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production && npm run server:prod",
     "server:prod": "node ./src/app.js",
-    "build": "babel ./src/app.js --out-dir build",
     "clean": "rimraf dist",
     "server": "cross-env DEBUG=app nodemon --exec babel-node ./src/app.js",
     "dev": "cross-env NODE_ENV=development npm-run-all server",
