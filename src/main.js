@@ -1,3 +1,7 @@
+import "babel-core/register";
+import "babel-polyfill";
+import "regenerator-runtime/runtime.js";
+
 let favoritesArray = [];
 let readingListArray = [];
 let completedArray = [];

@@ -1,5 +1,4 @@
-require("babel-core/register");
-require("babel-polyfill");
+
 import express from "express";
 import router from './routes/bookRoutes.js';
 import mongoose from "mongoose";

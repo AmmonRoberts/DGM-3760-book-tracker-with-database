@@ -12,10 +12,6 @@ var _dotenv = require("dotenv");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-require("babel-core/register");
-
-require("babel-polyfill");
-
 (0, _dotenv.config)();
 var app = (0, _express["default"])();
 var port = 3000;
