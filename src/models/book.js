@@ -5,7 +5,7 @@ let bookSchema = mongoose.Schema({
 	'bookName': String,
 	'authorName': String,
 	'isbn': String,
-	'apiBookId': String,
+	'bookKey': String,
 	'readingList': String,
 	'favoriteList': String,
 	'completedList': String,

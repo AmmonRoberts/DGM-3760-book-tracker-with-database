@@ -6,24 +6,24 @@ const bookController = {
         res.send(books)
     },
     getOne: async (req, res) => {
-        let id = req.params.id;
-        try {
+        let key = req.params.key;
 
-            const responseBook = await book.findOne({ id: id })
+        const responseBook = await book.findOne({ bookKey: key })
+
+
+        if (responseBook) {
             res.send(responseBook);
-
         }
-        catch {
-            res.status(404).send("Todo not found!")
+        else {
+            res.status(404).send("Book not found!")
         }
     },
     create: async (req, res) => {
         let requestBook = new book({
-            id: Math.floor(Math.random() * 1000000),
             bookName: req.body.bookName,
             authorName: req.body.authorName,
             isbn: req.body.isbn,
-            apiBookId: req.body.apiBookId,
+            bookKey: req.body.bookKey,
             readingList: req.body.readingList,
             favoriteList: req.body.favoriteList,
             completedList: req.body.completedList,
@@ -41,15 +41,15 @@ const bookController = {
         });
     },
     update: async (req, res) => {
-        let id = req.params.id;
+        let key = req.params.key;
 
         try {
-            let existingBook = await book.findOne({ id: id });
+            let existingBook = await book.findOne({ bookKey: key });
 
             existingBook.bookName = req.body.bookName
             existingBook.authorName = req.body.authorName
             existingBook.isbn = req.body.isbn
-            existingBook.apiBookId = req.body.apiBookId
+            existingBook.bookKey = req.body.bookKey
             existingBook.readingList = req.body.readingList
             existingBook.favoriteList = req.body.favoriteList
             existingBook.completedList = req.body.completedList
@@ -62,14 +62,14 @@ const bookController = {
         }
     },
     remove: async (req, res) => {
-        let id = req.params.id;
+        let key = req.params.key;
 
-        try {
-            await book.deleteOne({ id: id })
-            res.status(204).send("Successfully deleted!")
+        let response = await book.deleteOne({ bookKey: key })
+
+        if (response.deletedCount > 0) {
+            res.send("Successfully deleted!")
         }
-        catch {
-            //Literally doesn't get here, but I honestly can't even care right now
+        else {
             res.status(404).send("Book not found!")
 
         }

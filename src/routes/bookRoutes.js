@@ -6,12 +6,12 @@ let router = express.Router();
 
 router.get('/', bookController.getAll);
 
-router.get('/:id', bookController.getOne);
+router.get('/:key', bookController.getOne);
 
 router.post('/', bookController.create);
 
-router.put('/:id', bookController.update);
+router.put('/:key', bookController.update);
 
-router.delete('/:id', bookController.remove);
+router.delete('/:key', bookController.remove);
 
 export default router;

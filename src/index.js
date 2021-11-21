@@ -1,7 +1,3 @@
-/* eslint-disable no-unused-vars */
-// import "babel-core/register";
-// import "babel-polyfill";
-
 let favoritesArray = [];
 let readingListArray = [];
 let completedArray = [];
@@ -31,13 +27,12 @@ const search = async () => {
                 return response.json();
             })
             .then((data) => {
-                console.log(data);
                 let resultsElement = document.querySelector('#searchResults');
                 resultsElement.innerHTML = "";
                 data.docs.forEach(element => {
                     let d = document.createElement("div");
                     d.className = "searchResult";
-                    d.setAttribute("bookKey", element.key)
+                    d.setAttribute("bookKey", element.key.slice(7))
                     d.setAttribute("bookTitle", element.title)
                     d.setAttribute("bookAuthor", element.author_name)
                     d.innerHTML =
@@ -72,12 +67,16 @@ const search = async () => {
                                 key
                             }) => key === bookKey)) {
 
-
-                                favoritesArray.push({
+                                let bookObject = {
                                     "key": bookKey,
                                     "title": bookTitle,
-                                    "author": bookAuthor
-                                })
+                                    "author": bookAuthor,
+                                    "readingList": false,
+                                    "favoriteList": true,
+                                    "completedList": false
+                                }
+                                favoritesArray.push(bookObject)
+                                addToList(bookObject)
 
                                 let d = document.createElement("div");
                                 d.className = "searchResult";
@@ -103,12 +102,16 @@ const search = async () => {
                                 key
                             }) => key === bookKey)) {
 
-
-                                readingListArray.push({
+                                let bookObject = {
                                     "key": bookKey,
                                     "title": bookTitle,
-                                    "author": bookAuthor
-                                })
+                                    "author": bookAuthor,
+                                    "readingList": true,
+                                    "favoriteList": false,
+                                    "completedList": false
+                                }
+                                favoritesArray.push(bookObject)
+                                addToList(bookObject)
 
                                 let d = document.createElement("div");
                                 d.className = "searchResult";
@@ -133,12 +136,16 @@ const search = async () => {
                                 key
                             }) => key === bookKey)) {
 
-
-                                completedArray.push({
+                                let bookObject = {
                                     "key": bookKey,
                                     "title": bookTitle,
-                                    "author": bookAuthor
-                                })
+                                    "author": bookAuthor,
+                                    "readingList": false,
+                                    "favoriteList": false,
+                                    "completedList": true
+                                }
+                                favoritesArray.push(bookObject)
+                                addToList(bookObject)
 
                                 let d = document.createElement("div");
                                 d.className = "searchResult";
@@ -178,17 +185,156 @@ const search = async () => {
 }
 
 
-
-
 document.querySelector(`#search`).addEventListener('click', (event) => {
-    console.log("stuff")
     search();
     event.preventDefault();
 })
 document.querySelector(`#searchText`).addEventListener('keypress', (event) => {
     if (event.keyCode === 13) {
-        console.log("stuff")
         search();
         event.preventDefault();
     }
 })
+
+
+const addToList = async (book) => {
+    await fetch(`http://localhost:3000/books/${book.key}`)
+        .then(async (response) => {
+            if (response.ok) {
+                let responseJson = await response.json()
+
+                if (responseJson.readingList === "true") {
+                    book.readingList = true
+                }
+                if (responseJson.favoriteList === "true") {
+                    book.favoriteList = true
+                }
+                if (responseJson.completedList === "true") {
+                    book.completedList = true
+                }
+
+                // let responseJson = response.json()
+                await fetch(`http://localhost:3000/books/${book.key}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            bookName: book.title,
+                            authorName: book.author,
+                            bookKey: book.key,
+                            readingList: book.readingList,
+                            favoriteList: book.favoriteList,
+                            completedList: book.completedList
+                        })
+                    }
+
+
+
+                )
+            }
+            else {
+                await fetch("http://localhost:3000/books",
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            bookName: book.title,
+                            authorName: book.author,
+                            bookKey: book.key,
+                            readingList: book.readingList,
+                            favoriteList: book.favoriteList,
+                            completedList: book.completedList
+                        })
+                    })
+            }
+        })
+}
+
+const getAllBooks = async () => {
+    readingListArray = []
+    favoritesArray = []
+    completedArray = []
+
+    let favorites = document.querySelector("#favorites");
+    let readingList = document.querySelector("#readingList");
+    let completedList = document.querySelector("#completedList");
+
+    await fetch("http://localhost:3000/books")
+        .then(async (response) => {
+            let responseJson = await response.json()
+
+            responseJson.forEach((element) => {
+                if (element.readingList === "true") {
+
+                    readingListArray.push({
+                        "key": element.bookKey,
+                        "title": element.bookName,
+                        "author": element.authorName,
+                        "readingList": element.readingList,
+                        "favoriteList": element.favoriteList,
+                        "completedList": element.completedList
+                    })
+
+                    let d = document.createElement("div");
+                    d.className = "searchResult";
+                    d.setAttribute("key", element.bookKey)
+                    d.innerHTML = `
+                            <h4>${element.bookName}</h4>
+                            <p>${element.authorName}</p>
+                            
+                            `;
+                    readingList.appendChild(d);
+                }
+                if (element.completedList === "true") {
+
+                    completedArray.push({
+                        "key": element.bookKey,
+                        "title": element.bookName,
+                        "author": element.authorName,
+                        "readingList": element.readingList,
+                        "favoriteList": element.favoriteList,
+                        "completedList": element.completedList
+                    })
+
+                    let d = document.createElement("div");
+                    d.className = "searchResult";
+                    d.setAttribute("key", element.bookKey)
+                    d.innerHTML = `
+                            <h4>${element.bookName}</h4>
+                            <p>${element.authorName}</p>
+                            
+                            `;
+                    completedList.appendChild(d);
+                }
+                if (element.favoriteList === "true") {
+
+                    favoritesArray.push({
+                        "key": element.bookKey,
+                        "title": element.bookName,
+                        "author": element.authorName,
+                        "readingList": element.readingList,
+                        "favoriteList": element.favoriteList,
+                        "completedList": element.completedList
+                    })
+
+                    let d = document.createElement("div");
+                    d.className = "searchResult";
+                    d.setAttribute("key", element.bookKey)
+                    d.innerHTML = `
+                            <h4>${element.bookName}</h4>
+                            <p>${element.authorName}</p>
+                            
+                            `;
+                    favorites.appendChild(d);
+                }
+
+
+            })
+
+        })
+}
+getAllBooks()
